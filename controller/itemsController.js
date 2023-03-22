@@ -25,8 +25,17 @@ exports.getGroupMembers = async (req, res) => {
 
 // TODO #1.1: Get items from DynamoDB
 exports.getItems = async (req, res) => {
+  const params = {
+    TableName: process.env.aws_items_table_name,
+  };
+  try {
+    const data = await docClient.send(new ScanCommand(params));
+    res.send(data.Items);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err);
+  }
   // You should change the response below.
-  res.send("This route should get all items in DynamoDB.");
 };
 
 // TODO #1.2: Add an item to DynamoDB
@@ -35,8 +44,21 @@ exports.addItem = async (req, res) => {
   const created_date = Date.now();
   const item = { item_id: item_id, ...req.body, created_date: created_date };
 
+  const params = {
+    TableName: process.env.aws_items_table_name,
+    Items: item
+  }
+  try {
+    const data = await docClient.send(new PutCommand(params));
+    //params.addItem(item)
+    res.send(data);
+  
+  } catch (err) {
+    console.error(err)
+    res.status(500).send(err);
+  }
   // You should change the response below.
-  res.send("This route should add an item in DynamoDB.");
+  //res.send("This route should add an item in DynamoDB.");
 };
 
 // TODO #1.3: Delete an item from DynamDB
